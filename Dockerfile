@@ -9,9 +9,9 @@ COPY package*.json ./
 
 # Install dependencies
 RUN npm install
-
+# next-env.d.ts
 # Copy the rest of the application
-COPY components.json next-env.d.ts tsconfig.json next.config.ts postcss.config.mjs tailwind.config.ts ./ 
+COPY components.json tsconfig.json next.config.ts postcss.config.mjs tailwind.config.ts ./ 
 
 COPY ./src ./src
 COPY ./public ./public
