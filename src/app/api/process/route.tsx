@@ -55,7 +55,7 @@ export async function POST(request: NextRequest): Promise<Response> {
             }
 
             // Call the REST API
-            const response = await fetch('http://web:8000/query-llm', {
+            const response = await fetch('https://step1-597659953171.us-central1.run.app/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
