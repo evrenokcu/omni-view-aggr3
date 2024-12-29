@@ -54,8 +54,16 @@ export async function POST(request: NextRequest): Promise<Response> {
                 return new Response(JSON.stringify({ error: 'Both text and llm are required' }), { status: 400 });
             }
 
+            const apiUrl = process.env.REST_API_URL;
+
+            if (!apiUrl) {
+                throw new Error("REST_API_URL is not defined in environment variables");
+            }
+
             // Call the REST API
-            const response = await fetch('https://step1-597659953171.us-central1.run.app/', {
+            //const response = await fetch('https://step1-597659953171.us-central1.run.app/', {
+            const response = await fetch(apiUrl, {
+
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
