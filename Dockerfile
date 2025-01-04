@@ -1,6 +1,9 @@
-# Use Node.js LTS as the base image
-FROM node:18-alpine
+# Stage 1: Build stage
+FROM node:18-alpine AS builder
+
+# Install curl (optional) and other build dependencies
 RUN apk add --no-cache curl
+
 # Set working directory
 WORKDIR /app
 
@@ -9,16 +12,29 @@ COPY package*.json ./
 
 # Install dependencies
 RUN npm install
-# next-env.d.ts
-# Copy the rest of the application
-COPY components.json tsconfig.json next.config.ts postcss.config.mjs tailwind.config.ts ./ 
 
+# Copy the rest of the application files
+COPY components.json tsconfig.json next.config.ts postcss.config.mjs tailwind.config.ts ./
 COPY ./src ./src
 COPY ./public ./public
 
-
 # Build the Next.js app
 RUN npm run build
+
+# Stage 2: Runtime stage
+FROM node:18-alpine
+
+# Install curl (optional) for runtime
+RUN apk add --no-cache curl
+
+# Set working directory
+WORKDIR /app
+
+# Copy only the built application and dependencies from the build stage
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
 
 # Expose the port Next.js runs on
 EXPOSE 3000
