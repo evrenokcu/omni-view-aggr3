@@ -32,13 +32,14 @@ export async function POST(request: NextRequest): Promise<Response> {
                     response: `${processed} - Gemini's response`,
                     timestamp: new Date().toISOString(),
                     status: "completed"
-                },
-                "Groq": {
-                    llm: "Groq",
-                    response: `${processed} - Groq's response`,
-                    timestamp: new Date().toISOString(),
-                    status: "completed"
                 }
+                // ,
+                // "Groq": {
+                //     llm: "Groq",
+                //     response: `${processed} - Groq's response`,
+                //     timestamp: new Date().toISOString(),
+                //     status: "completed"
+                // }
 
             };
 
