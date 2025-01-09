@@ -28,6 +28,8 @@ export function LlmCard({ response, className }: LlmCardProps) {
                 return "bg-emerald-200";
             case "Gemini":
                 return "bg-blue-200";
+            case "Groq":
+                return "bg-blue-200";
         }
     };
 

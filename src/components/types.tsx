@@ -39,7 +39,7 @@ export class DefaultLlmResponse implements LlmResponse {
     }
 }
 
-export const LLM_NAMES = ["Claude", "ChatGPT", "Gemini"];
+export const LLM_NAMES = ["Claude", "ChatGPT", "Gemini", "Groq"];
 
 export class DefaultLlmResponses implements LlmResponses {
     responses: Array<LlmResponse>;
