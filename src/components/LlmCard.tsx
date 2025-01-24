@@ -43,28 +43,28 @@ export function LlmCard({ response, className }: LlmCardProps) {
             <Card className={`flex-shrink-0 w-[1000px] bg-gray-800/50 border-gray-700 ${className}`}>
                 <div className="p-6">
                     <div className="flex items-center gap-3 mb-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getAvatarStyles(response.llm)}`}>
-                            <span className="text-sm font-semibold text-gray-800">{response.llm[0]}</span>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getAvatarStyles(response.llm_name)}`}>
+                            <span className="text-sm font-semibold text-gray-800">{response.llm_name[0]}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="font-medium text-white text-lg">{response.llm}</span>
+                            <span className="font-medium text-white text-lg">{response.llm_name}</span>
                             <span className="text-sm text-emerald-500">{response.status}</span>
                             <span className="text-sm text-gray-400">{formatTimestamp(response.timestamp)}</span>
                         </div>
                     </div>
                     <div className="text-white text-base leading-relaxed mb-4 h-[200px] overflow-y-auto">
                         <p>
-                            {expandedCards[response.llm]
+                            {expandedCards[response.llm_name]
                                 ? response.response
                                 : `${response.response.slice(0, 200)}...`}
                         </p>
                         {response.response.length > 200 && (
                             <Button
                                 variant="link"
-                                onClick={() => toggleExpand(response.llm)}
+                                onClick={() => toggleExpand(response.llm_name)}
                                 className="mt-2 text-blue-400 hover:text-blue-300"
                             >
-                                {expandedCards[response.llm] ? 'See less' : 'See more'}
+                                {expandedCards[response.llm_name] ? 'See less' : 'See more'}
                             </Button>
                         )}
                         {response.assessment && (
@@ -108,11 +108,11 @@ export function LlmCard({ response, className }: LlmCardProps) {
                         <Card className="w-full h-full rounded-lg">
                             <div className="p-6">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getAvatarStyles(response.llm)}`}>
-                                        <span className="text-sm font-semibold text-gray-800">{response.llm[0]}</span>
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getAvatarStyles(response.llm_name)}`}>
+                                        <span className="text-sm font-semibold text-gray-800">{response.llm_name[0]}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="font-medium text-black text-lg">{response.llm}</span>
+                                        <span className="font-medium text-black text-lg">{response.llm_name}</span>
                                         <span className="text-sm text-emerald-500">{response.status}</span>
                                         <span className="text-sm text-gray-400">{formatTimestamp(response.timestamp)}</span>
                                     </div>

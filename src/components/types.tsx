@@ -1,5 +1,5 @@
 export interface LlmResponse {
-    llm: string;
+    llm_name: string;
     response: string;
     timestamp: string;
     status: string;
@@ -11,14 +11,14 @@ export interface LlmResponses {
     summary: LlmResponse;
 }
 export class DefaultLlmResponse implements LlmResponse {
-    llm: string;
+    llm_name: string;
     response: string;
     timestamp: string;
     status: string;
     assessment?: string;
 
     constructor(llm: string, status: string) {
-        this.llm = llm;
+        this.llm_name = llm;
         this.response = "";
         this.timestamp = new Date().toISOString();
         this.status = status;

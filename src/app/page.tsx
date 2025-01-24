@@ -34,7 +34,7 @@ export default function Page() {
         setAllResults((prev) =>
             updateLlmResponses(prev, idx, (responses) => {
                 responses.summary = {
-                    llm: randomLlm,
+                    llm_name: randomLlm,
                     response: "",
                     timestamp: new Date().toISOString(),
                     status: "pending",
@@ -71,7 +71,7 @@ export default function Page() {
             setAllResults((prev) =>
                 updateLlmResponses(prev, idx, (responses) => {
                     responses.summary = {
-                        llm: randomLlm,
+                        llm_name: randomLlm,
                         response: "Failed to summarize responses",
                         timestamp: new Date().toISOString(),
                         status: "error",
