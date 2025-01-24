@@ -38,6 +38,9 @@ export default function Page() {
                     response: "",
                     timestamp: new Date().toISOString(),
                     status: "pending",
+                    duration: 0,
+                    token_count: 0,
+                    price: 0,
                 };
                 return responses;
             })
@@ -75,6 +78,9 @@ export default function Page() {
                         response: "Failed to summarize responses",
                         timestamp: new Date().toISOString(),
                         status: "error",
+                        duration: 0,
+                        token_count: 0,
+                        price: 0,
                     };
                     return responses;
                 })

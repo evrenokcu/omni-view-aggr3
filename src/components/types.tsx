@@ -4,6 +4,9 @@ export interface LlmResponse {
     timestamp: string;
     status: string;
     assessment?: string;
+    duration: number;
+    token_count: number;
+    price: number;
 }
 
 export interface LlmResponses {
@@ -16,6 +19,9 @@ export class DefaultLlmResponse implements LlmResponse {
     timestamp: string;
     status: string;
     assessment?: string;
+    duration: number;
+    token_count: number;
+    price: number;
 
     constructor(llm: string, status: string) {
         this.llm_name = llm;
@@ -23,6 +29,9 @@ export class DefaultLlmResponse implements LlmResponse {
         this.timestamp = new Date().toISOString();
         this.status = status;
         this.assessment = undefined;
+        this.duration = 0;
+        this.token_count = 0;
+        this.price = 0;
     }
 
     // Factory method to create a response with status 'pending'
