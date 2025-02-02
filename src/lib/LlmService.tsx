@@ -1,28 +1,8 @@
-// src/lib/LLMService.tsx
 import { AggregatedPrice, AggregatedPriceResponse, LlmModelConfig } from '@/components/types';
 import fs from 'fs';
 import path from 'path';
+// import { AggregatedPriceResponse, AggregatedPrice, LlmModel, LlmModelConfig } from './interfaces'; // adjust the import as needed
 
-/** 
- * Represents a language model.
- */
-
-
-/**
- * LLMService is responsible for loading the AggregatedPriceResponse from files.
- * It caches the response and reloads it only if the cache is older than one minute.
- *
- * In this updated version, two files are read:
- *
- * 1. aggregatedPriceResponse.json — originally containing pricing data keyed by IDs.
- * 2. llm_registry.json — containing an array of LLM registration entries.
- *
- * The service then merges the two sources: the registry file is used as the base,
- * and when matching pricing data is found in the aggregated file (by computed ID),
- * that pricing and timestamp are added to the entry.
- *
- * Finally, only enabled entries are returned.
- */
 export class LLMService {
     // Cached AggregatedPriceResponse.
     private static cache: AggregatedPriceResponse | null = null;
@@ -30,15 +10,18 @@ export class LLMService {
     private static lastReadTimestamp: number = 0;
     // Cache Time-To-Live: 1 minute (60,000 milliseconds)
     private static readonly cacheTTL = 60 * 1000;
-    // Absolute path to the JSON files.
+
+    // Get the configuration directory from the environment variable.
+    // If not set, fall back to the default "config" folder in the project root.
+    private static readonly configDir: string = process.env.CACHE_DIR || path.join(process.cwd(), 'config');
+
+    // Build absolute paths using the configuration directory.
     private static readonly aggregatedFilePath = path.join(
-        process.cwd(),
-        'config',
+        LLMService.configDir,
         'aggregatedPriceResponse.json'
     );
     private static readonly registryFilePath = path.join(
-        process.cwd(),
-        'config',
+        LLMService.configDir,
         'llm_registry.json'
     );
 
