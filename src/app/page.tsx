@@ -6,10 +6,10 @@ import { Navigation } from '@/components/navigation';
 import { PromptComp } from '@/components/promptComp';
 
 
-import { DefaultLlmResponse, DefaultLlmResponses, insertLlmResponses, LlmResponse, LlmResponses, updateLlmResponses } from '@/components/types';
+import { AggregatedPriceResponse, DefaultLlmResponse, DefaultLlmResponses, insertLlmResponses, LlmModel, LlmResponse, LlmResponses, updateLlmResponses } from '@/components/types';
 import { LlmResults } from '@/components/LlmResults';
 import { TabOption } from '@/types/aggregator';
-import { AggregatedPriceResponse } from '@/lib/LlmService';
+
 
 
 
@@ -47,17 +47,25 @@ export default function Page() {
         const summarizePrompt = `summarize all responses from these llms\n${allTexts}`;
 
         // Choose a random LLM
-        let randomLlm = "DefaultLLM"; // fallback if aggregatedPriceData is not available
-        if (aggregatedPriceData && aggregatedPriceData.responses.length > 0) {
+        const defaultLlm: LlmModel = {
+            llm_name: "DefaultLLM",
+            model_name: "default",
+            id: "DefaultLLM:default",
+        };
+
+        let randomLlm: LlmModel;
+        if (aggregatedPriceData && aggregatedPriceData.responses && aggregatedPriceData.responses.length > 0) {
             const randomIndex = Math.floor(Math.random() * aggregatedPriceData.responses.length);
-            randomLlm = aggregatedPriceData.responses[randomIndex].config.model.llm_name;
+            randomLlm = aggregatedPriceData.responses[randomIndex].config.model;
+        } else {
+            randomLlm = defaultLlm;
         }
 
         // Set the summary status to "pending"
         setAllResults((prev) =>
             updateLlmResponses(prev, idx, (responses) => {
                 responses.summary = {
-                    llm_name: randomLlm,
+                    llm: randomLlm,
                     response: "",
                     timestamp: new Date().toISOString(),
                     status: "pending",
@@ -97,7 +105,7 @@ export default function Page() {
             setAllResults((prev) =>
                 updateLlmResponses(prev, idx, (responses) => {
                     responses.summary = {
-                        llm_name: randomLlm,
+                        llm: randomLlm,
                         response: "Failed to summarize responses",
                         timestamp: new Date().toISOString(),
                         status: "error",
@@ -144,7 +152,7 @@ export default function Page() {
             } catch (error) {
                 console.error(error);
                 setAllResults(prev => {
-                    return insertLlmResponses(prev, newIndex, llmIndex, () => DefaultLlmResponse.createError(entry.config.model.id))
+                    return insertLlmResponses(prev, newIndex, llmIndex, () => DefaultLlmResponse.createError(entry.config.model))
                 });
             }
             // ... your existing code using llmName ...
@@ -200,15 +208,6 @@ export default function Page() {
             <main className="flex-grow flex flex-col items-center p-6">
                 <div className="w-full max-w-[1200px]">
                     <h1>{isRunning}</h1>
-
-                    {aggregatedPriceData && (
-                        <div className="aggregated-price">
-                            <h2>Aggregated Price Data</h2>
-                            <pre>{JSON.stringify(aggregatedPriceData, null, 2)}</pre>
-                        </div>
-                    )}
-
-
                     {allResults.map((results, idx) => (
                         <div key={idx} style={{ margin: '16px 0' }}>
                             <LlmResults

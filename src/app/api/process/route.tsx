@@ -1,4 +1,5 @@
-import { LlmModel } from '@/lib/LlmService';
+
+import { LlmModel } from '@/components/types';
 import { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest): Promise<Response> {

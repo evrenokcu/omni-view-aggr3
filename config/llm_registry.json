@@ -34,5 +34,14 @@
         "enabled": false,
         "color": "#000080",
         "initial_char": "O"
+    },
+    {
+        "model": {
+            "llm_name": "Gemini",
+            "model_name": "gemini-exp-1121"
+        },
+        "enabled": true,
+        "color": "#000090",
+        "initial_char": "O"
     }
 ]

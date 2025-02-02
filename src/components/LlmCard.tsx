@@ -47,11 +47,11 @@ export function LlmCard({ response, className }: LlmCardProps) {
             <Card className={`"w-full max-w-4xl bg-[#232426] border-gray-700 overflow-hidden" ${className}`}>
                 <div className="p-6">
                     <div className="flex items-center gap-3 mb-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getAvatarStyles(response.llm_name)}`}>
-                            <span className="text-sm font-semibold text-gray-800">{response.llm_name[0]}</span>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getAvatarStyles(response.llm.llm_name)}`}>
+                            <span className="text-sm font-semibold text-gray-800">{response.llm.llm_name[0]}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="font-medium text-white text-lg">{response.llm_name}</span>
+                            <span className="font-medium text-white text-lg">{response.llm.llm_name}</span>
                             <span className="text-sm text-emerald-500">{response.status}</span>
                             <span className="text-sm text-gray-400">{formatTimestamp(response.timestamp)}</span>
                         </div>
@@ -89,7 +89,7 @@ export function LlmCard({ response, className }: LlmCardProps) {
                             </div>
                         ) : (
                             <p>
-                                {expandedCards[response.llm_name]
+                                {expandedCards[response.llm.llm_name]
                                     ? response.response
                                     : `${response.response.slice(0, 200)}...`}
                             </p>
@@ -98,10 +98,10 @@ export function LlmCard({ response, className }: LlmCardProps) {
                         {response.response.length > 200 && response.status === "completed" && (
                             <Button
                                 variant="link"
-                                onClick={() => toggleExpand(response.llm_name)}
+                                onClick={() => toggleExpand(response.llm.llm_name)}
                                 className="mt-2 text-blue-400 hover:text-blue-300"
                             >
-                                {expandedCards[response.llm_name] ? 'See less' : 'See more'}
+                                {expandedCards[response.llm.llm_name] ? 'See less' : 'See more'}
                             </Button>
                         )}
 
@@ -177,11 +177,11 @@ export function LlmCard({ response, className }: LlmCardProps) {
                         <Card className="w-full h-full rounded-lg">
                             <div className="p-6">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getAvatarStyles(response.llm_name)}`}>
-                                        <span className="text-sm font-semibold text-gray-800">{response.llm_name[0]}</span>
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getAvatarStyles(response.llm.llm_name)}`}>
+                                        <span className="text-sm font-semibold text-gray-800">{response.llm.llm_name[0]}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="font-medium text-black text-lg">{response.llm_name}</span>
+                                        <span className="font-medium text-black text-lg">{response.llm.llm_name}</span>
                                         <span className="text-sm text-emerald-500">{response.status}</span>
                                         <span className="text-sm text-gray-400">{formatTimestamp(response.timestamp)}</span>
                                     </div>

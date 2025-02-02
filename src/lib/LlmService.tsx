@@ -1,55 +1,12 @@
 // src/lib/LLMService.tsx
+import { AggregatedPrice, AggregatedPriceResponse, LlmModelConfig } from '@/components/types';
 import fs from 'fs';
 import path from 'path';
 
 /** 
  * Represents a language model.
  */
-export interface LlmModel {
-    llm_name: string; // e.g. "ChatGPT", "CLAUDE", "Gemini"
-    model_name: string;
-    // Computed field (typically computed as `${llm_name}:${model_name}`)
-    id: string;
-}
 
-/**
- * Represents the configuration for an LLM model.
- */
-export interface LlmModelConfig {
-    model: LlmModel;
-    enabled: boolean;
-    color: string;
-    initial_char: string; // expected to be a single character
-    // Computed field (using the nested model's id)
-    id: string;
-}
-
-/**
- * Represents a pricing detail.
- */
-export interface ModelPrice {
-    input_price: number;
-    output_price: number;
-    currency: string;
-}
-
-/**
- * Represents an aggregated price entry.
- * (We include pricing here in case you want to use it; if not, you can ignore it.)
- */
-export interface AggregatedPrice {
-    config: LlmModelConfig;
-    price?: ModelPrice;
-    // Optionally, you could also include a timestamp if needed.
-    timestamp?: string;
-}
-
-/**
- * Represents the overall aggregated price response.
- */
-export interface AggregatedPriceResponse {
-    responses: AggregatedPrice[];
-}
 
 /**
  * LLMService is responsible for loading the AggregatedPriceResponse from files.
