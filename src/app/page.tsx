@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Askllm } from "@/components/ask-llm"
 import { Navigation } from '@/components/navigation';
 import { PromptComp } from '@/components/promptComp';
 
 
-import { DefaultLlmResponse, DefaultLlmResponses as EmptyLlmResponses, insertLlmResponses, LLM_NAMES, LlmResponse, LlmResponses, updateLlmResponses } from '@/components/types';
+import { DefaultLlmResponse, DefaultLlmResponses, insertLlmResponses, LlmResponse, LlmResponses, updateLlmResponses } from '@/components/types';
 import { LlmResults } from '@/components/LlmResults';
 import { TabOption } from '@/types/aggregator';
+import { AggregatedPriceResponse } from '@/lib/LlmService';
+
+
 
 
 export default function Page() {
@@ -16,7 +19,23 @@ export default function Page() {
     const [activeTab, setActiveTab] = useState<TabOption>("Continuous")
     const [isRunning, setIsRunning] = useState(false)
     const [prompt, setPrompt] = useState('');
+    const [aggregatedPriceData, setAggregatedPriceData] = useState<AggregatedPriceResponse | null>(null);
 
+    useEffect(() => {
+        async function fetchAggregatedPrice() {
+            try {
+                const res = await fetch('/api/aggregated-price');
+                if (!res.ok) {
+                    throw new Error('Failed to fetch aggregated price data');
+                }
+                const data: AggregatedPriceResponse = await res.json();
+                setAggregatedPriceData(data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchAggregatedPrice();
+    }, []);
 
     const handleSummarize = async (responses: LlmResponses, idx: number) => {
         setIsRunning(true); // Indicate that the function is running
@@ -28,7 +47,11 @@ export default function Page() {
         const summarizePrompt = `summarize all responses from these llms\n${allTexts}`;
 
         // Choose a random LLM
-        const randomLlm = LLM_NAMES[Math.floor(Math.random() * LLM_NAMES.length)];
+        let randomLlm = "DefaultLLM"; // fallback if aggregatedPriceData is not available
+        if (aggregatedPriceData && aggregatedPriceData.responses.length > 0) {
+            const randomIndex = Math.floor(Math.random() * aggregatedPriceData.responses.length);
+            randomLlm = aggregatedPriceData.responses[randomIndex].config.model.llm_name;
+        }
 
         // Set the summary status to "pending"
         setAllResults((prev) =>
@@ -93,20 +116,23 @@ export default function Page() {
 
     const handleSubmitNew = async (text: string) => {
         setIsRunning(true);
-        const initialResponses = new EmptyLlmResponses();
+        const initialResponses = new DefaultLlmResponses(aggregatedPriceData!);
         const newIndex = allResults.length;
         setAllResults(prev => [...prev, initialResponses]);
 
-        const fetchPromises = LLM_NAMES.map(async (llmName, llmIndex) => {
-            // const llmIndex = LLM_NAMES.indexOf(llmName);
+        const fetchPromises = aggregatedPriceData?.responses.map(async (entry, llmIndex) => {
+            // const llmName = entry.config.model.llm_name;
+            // const model = entry.config.model.model_name;
             try {
                 const response = await fetch('/api/process', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, llm: llmName })
+                    body: JSON.stringify({ text, llm: entry.config.model })
                 });
 
                 if (!response.ok) {
+                    const errorBody = await response.text();
+                    console.error('Network response not ok. Status:', response.status, 'Response body:', errorBody);
                     throw new Error('Network response was not ok');
                 }
 
@@ -118,10 +144,37 @@ export default function Page() {
             } catch (error) {
                 console.error(error);
                 setAllResults(prev => {
-                    return insertLlmResponses(prev, newIndex, llmIndex, () => DefaultLlmResponse.createError(llmName))
+                    return insertLlmResponses(prev, newIndex, llmIndex, () => DefaultLlmResponse.createError(entry.config.model.id))
                 });
             }
-        });
+            // ... your existing code using llmName ...
+        }) ?? [];
+
+        // const fetchPromises = LLM_NAMES.map(async (llmName, llmIndex) => {
+        //     // const llmIndex = LLM_NAMES.indexOf(llmName);
+        //     try {
+        //         const response = await fetch('/api/process', {
+        //             method: 'POST',
+        //             headers: { 'Content-Type': 'application/json' },
+        //             body: JSON.stringify({ text, llm: llmName })
+        //         });
+
+        //         if (!response.ok) {
+        //             throw new Error('Network response was not ok');
+        //         }
+
+        //         const data = await response.json() as LlmResponse;
+
+        //         setAllResults(prev => {
+        //             return insertLlmResponses(prev, newIndex, llmIndex, () => data)
+        //         });
+        //     } catch (error) {
+        //         console.error(error);
+        //         setAllResults(prev => {
+        //             return insertLlmResponses(prev, newIndex, llmIndex, () => DefaultLlmResponse.createError(llmName))
+        //         });
+        //     }
+        // });
         await Promise.all(fetchPromises);
         setIsRunning(false);
     }
@@ -136,6 +189,10 @@ export default function Page() {
         }
     };
 
+    // src/app/api/aggregated-price/route.ts
+
+
+
 
     return (
         <div className="min-h-screen bg-[#0B1120] text-white flex flex-col">
@@ -143,6 +200,14 @@ export default function Page() {
             <main className="flex-grow flex flex-col items-center p-6">
                 <div className="w-full max-w-[1200px]">
                     <h1>{isRunning}</h1>
+
+                    {aggregatedPriceData && (
+                        <div className="aggregated-price">
+                            <h2>Aggregated Price Data</h2>
+                            <pre>{JSON.stringify(aggregatedPriceData, null, 2)}</pre>
+                        </div>
+                    )}
+
 
                     {allResults.map((results, idx) => (
                         <div key={idx} style={{ margin: '16px 0' }}>

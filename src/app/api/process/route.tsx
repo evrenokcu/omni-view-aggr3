@@ -1,3 +1,4 @@
+import { LlmModel } from '@/lib/LlmService';
 import { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest): Promise<Response> {
@@ -55,18 +56,34 @@ export async function POST(request: NextRequest): Promise<Response> {
     else {
         try {
             // Extract input from the request body
-            const { text, llm } = await request.json() as { text: string; llm: string };
+            const { text, llm } = await request.json() as { text: string; llm: LlmModel; };
 
             // Validate input
             if (!text || !llm) {
                 return new Response(JSON.stringify({ error: 'Both text and llm are required' }), { status: 400 });
             }
 
+            const requestBody = {
+                llm: {
+                    llm_name: llm.llm_name,
+                    model_name: llm.model_name,
+                },
+                prompt: text,
+            };
+            console.log(JSON.stringify(requestBody));
+
+
+
+
+
             const apiUrl = process.env.REST_API_URL;
+
 
             if (!apiUrl) {
                 throw new Error("REST_API_URL is not defined in environment variables");
             }
+
+
 
             // Call the REST API
             //const response = await fetch('https://step1-597659953171.us-central1.run.app/', {
@@ -76,10 +93,7 @@ export async function POST(request: NextRequest): Promise<Response> {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    llm_name: llm,
-                    prompt: text,
-                }),
+                body: JSON.stringify(requestBody),
             });
 
             if (!response.ok) {

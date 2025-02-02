@@ -1,3 +1,12 @@
+import { AggregatedPriceResponse } from "@/lib/LlmService";
+
+export interface LlmModel {
+    llm_name: string; // e.g. "ChatGPT", "CLAUDE", "Gemini"
+    model_name: string;
+    // Computed field (typically computed as `${llm_name}:${model_name}`)
+    id: string;
+}
+
 export interface LlmResponse {
     llm_name: string;
     response: string;
@@ -54,9 +63,12 @@ export class DefaultLlmResponses implements LlmResponses {
     responses: Array<LlmResponse>;
     summary: LlmResponse;
 
-    constructor() {
-        this.responses = LLM_NAMES.map((name) => DefaultLlmResponse.createPending(name));
-        this.summary = DefaultLlmResponse.createCreated(LLM_NAMES[0]);
+    constructor(aggregatedPriceData?: AggregatedPriceResponse) {
+        const names = aggregatedPriceData
+            ? aggregatedPriceData.responses.map(entry => entry.config.model.llm_name)
+            : LLM_NAMES;
+        this.responses = names.map((name) => DefaultLlmResponse.createPending(name));
+        this.summary = DefaultLlmResponse.createCreated(names[0]);
     }
 }
 export function updateLlmResponses(
