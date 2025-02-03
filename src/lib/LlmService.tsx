@@ -18,7 +18,7 @@ export class LLMService {
     // Build absolute paths using the configuration directory.
     private static readonly aggregatedFilePath = path.join(
         LLMService.configDir,
-        'aggregatedPriceResponse.json'
+        'llm_prices_cache.json'
     );
     private static readonly registryFilePath = path.join(
         LLMService.configDir,
