@@ -21,14 +21,6 @@ export default function Page() {
     const [prompt, setPrompt] = useState('');
     const [aggregatedPriceData, setAggregatedPriceData] = useState<AggregatedPriceResponse | null>(null);
 
-    const [files, setFiles] = useState<string[]>([]);
-
-    useEffect(() => {
-        fetch('/api/listFiles')
-            .then(response => response.json())
-            .then(data => setFiles(data.files || []));
-    }, []);
-
     useEffect(() => {
         async function fetchAggregatedPrice() {
             try {
@@ -211,59 +203,37 @@ export default function Page() {
 
 
     return (
-        <div>
-            <div className="min-h-screen bg-[#0B1120] text-white flex flex-col">
-                <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
-                <main className="flex-grow flex flex-col items-center p-6">
-                    <div className="w-full max-w-[1200px]">
-                        <h1>{isRunning}</h1>
-                        {allResults.map((results, idx) => (
-                            <div key={idx} style={{ margin: '16px 0' }}>
-                                <LlmResults
-                                    results={results}
-                                    onAssess={(responses) => {
-                                        const allTexts = responses.responses
-                                            .filter((r) => r !== null)
-                                            .map((r) => r!.response)
-                                            .join('\n');
 
-                                        const newPrompt = `${allTexts}\nthese are all responses from several llms, check them all and get benefit of each`;
-                                        handleSubmitNew(newPrompt);
-                                    }}
-                                    onSummarize={(responses) => handleSummarize(responses, idx)}
-                                />
-                            </div>
-                        ))}
-                        <PromptComp prompt={prompt} />
-                        <Askllm onSubmit={handleSubmitWithLogging} isRunning={isRunning} />
+        <div className="min-h-screen bg-[#0B1120] text-white flex flex-col">
+            <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+            <main className="flex-grow flex flex-col items-center p-6">
+                <div className="w-full max-w-[1200px]">
+                    <h1>{isRunning}</h1>
+                    {allResults.map((results, idx) => (
+                        <div key={idx} style={{ margin: '16px 0' }}>
+                            <LlmResults
+                                results={results}
+                                onAssess={(responses) => {
+                                    const allTexts = responses.responses
+                                        .filter((r) => r !== null)
+                                        .map((r) => r!.response)
+                                        .join('\n');
+
+                                    const newPrompt = `${allTexts}\nthese are all responses from several llms, check them all and get benefit of each`;
+                                    handleSubmitNew(newPrompt);
+                                }}
+                                onSummarize={(responses) => handleSummarize(responses, idx)}
+                            />
+                        </div>
+                    ))}
+                    <PromptComp prompt={prompt} />
+                    <Askllm onSubmit={handleSubmitWithLogging} isRunning={isRunning} />
 
 
-                    </div>
-                </main>
-            </div>
-            <div style={{ padding: '20px', fontFamily: 'Arial' }}>
-                <h1>Files in /price</h1>
-                <div style={{ display: 'flex' }}>
-                    <div style={{ width: '30%', marginRight: '20px' }}>
-                        <h2>File List</h2>
-                        <ul>
-                            {files.map(file => (
-                                <li
-                                    key={file}
-
-                                    style={{
-                                        cursor: 'pointer',
-                                        color: 'blue',
-                                        marginBottom: '10px'
-                                    }}
-                                >
-                                    {file}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
                 </div>
-            </div>
+            </main>
         </div>
+
+
     );
 }
