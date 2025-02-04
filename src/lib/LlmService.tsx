@@ -30,6 +30,9 @@ export class LLMService {
      * it reads the files again to update the cache.
      */
     public static async getAggregatedPriceResponse(): Promise<AggregatedPriceResponse> {
+        console.log('Configuration Directory:', LLMService.configDir);
+        console.log('Aggregated File Path:', LLMService.aggregatedFilePath);
+        console.log('Registry File Path:', LLMService.registryFilePath);
         const now = Date.now();
 
         if (!this.cache || now - this.lastReadTimestamp > this.cacheTTL) {
