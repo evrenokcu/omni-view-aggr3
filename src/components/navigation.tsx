@@ -13,7 +13,7 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
     <div className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700">
       <div className="flex items-center">
         <h1 className="text-xl font-bold mr-8">Omvi</h1>
-        <div className="flex space-x-2 bg-gray-700 rounded-full p-1">
+        {/* <div className="flex space-x-2 bg-gray-700 rounded-full p-1">
           {["Continuous", "Considered"].map((tab) => (
             <button
               key={tab}
@@ -27,7 +27,7 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
               {tab}
             </button>
           ))}
-        </div>
+        </div> */}
       </div>
       <div className="flex items-center space-x-4">
         <Search className="w-6 h-6 text-gray-400" />
