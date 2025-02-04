@@ -39,6 +39,7 @@ COPY --from=builder /app/public ./public
 # Expose the port Next.js runs on
 EXPOSE 3000
 
+VOLUME /price
 
 # Start the Next.js application
 CMD ["npm", "start"]
