@@ -197,11 +197,6 @@ export default function Page() {
         }
     };
 
-    // src/app/api/aggregated-price/route.ts
-
-
-
-
     return (
 
         <div className="min-h-screen bg-[#0B1120] text-white flex flex-col">
