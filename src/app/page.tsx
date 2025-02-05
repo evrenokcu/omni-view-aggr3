@@ -1,18 +1,11 @@
 "use client";
-
 import { useEffect, useState } from 'react';
 import { Askllm } from "@/components/ask-llm"
 import { Navigation } from '@/components/navigation';
 import { PromptComp } from '@/components/promptComp';
-
-
-import { AggregatedPriceResponse, DefaultLlmResponse, DefaultLlmResponses, insertLlmResponses, LlmModel, LlmResponse, LlmResponses, updateLlmResponses } from '@/components/types';
+import { AggregatedPriceResponse, DefaultLlmResponse, DefaultLlmResponses, insertLlmResponses, LlmModel, LlmResponse, LlmResponses, SingleLlmRequest, updateLlmResponses } from '@/components/types';
 import { LlmResults } from '@/components/LlmResults';
 import { TabOption } from '@/types/aggregator';
-
-
-
-
 
 export default function Page() {
     const [allResults, setAllResults] = useState<LlmResponses[]>([]);
@@ -78,11 +71,18 @@ export default function Page() {
         );
 
         try {
+
+            const requestBody: SingleLlmRequest = {
+                llm: randomLlm,
+                prompt: summarizePrompt
+            };
+
+
             // Perform the API call
             const response = await fetch('/api/process', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: summarizePrompt, llm: randomLlm }),
+                body: JSON.stringify(requestBody),
             });
 
             if (!response.ok) {
@@ -129,13 +129,16 @@ export default function Page() {
         setAllResults(prev => [...prev, initialResponses]);
 
         const fetchPromises = aggregatedPriceData?.responses.map(async (entry, llmIndex) => {
-            // const llmName = entry.config.model.llm_name;
-            // const model = entry.config.model.model_name;
+            const requestBody: SingleLlmRequest = {
+                llm: entry.config.model,
+                prompt: text
+            };
+
             try {
                 const response = await fetch('/api/process', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, llm: entry.config.model })
+                    body: JSON.stringify(requestBody)
                 });
 
                 if (!response.ok) {
@@ -155,34 +158,7 @@ export default function Page() {
                     return insertLlmResponses(prev, newIndex, llmIndex, () => DefaultLlmResponse.createError(entry.config.model))
                 });
             }
-            // ... your existing code using llmName ...
         }) ?? [];
-
-        // const fetchPromises = LLM_NAMES.map(async (llmName, llmIndex) => {
-        //     // const llmIndex = LLM_NAMES.indexOf(llmName);
-        //     try {
-        //         const response = await fetch('/api/process', {
-        //             method: 'POST',
-        //             headers: { 'Content-Type': 'application/json' },
-        //             body: JSON.stringify({ text, llm: llmName })
-        //         });
-
-        //         if (!response.ok) {
-        //             throw new Error('Network response was not ok');
-        //         }
-
-        //         const data = await response.json() as LlmResponse;
-
-        //         setAllResults(prev => {
-        //             return insertLlmResponses(prev, newIndex, llmIndex, () => data)
-        //         });
-        //     } catch (error) {
-        //         console.error(error);
-        //         setAllResults(prev => {
-        //             return insertLlmResponses(prev, newIndex, llmIndex, () => DefaultLlmResponse.createError(llmName))
-        //         });
-        //     }
-        // });
         await Promise.all(fetchPromises);
         setIsRunning(false);
     }
@@ -223,8 +199,6 @@ export default function Page() {
                     ))}
                     <PromptComp prompt={prompt} />
                     <Askllm onSubmit={handleSubmitWithLogging} isRunning={isRunning} />
-
-
                 </div>
             </main>
         </div>

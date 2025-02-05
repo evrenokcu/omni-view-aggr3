@@ -3,7 +3,7 @@ export interface LlmModel {
     llm_name: string; // e.g. "ChatGPT", "CLAUDE", "Gemini"
     model_name: string;
     // Computed field (typically computed as `${llm_name}:${model_name}`)
-    id: string;
+    //id: string;
 }
 
 /**
@@ -16,6 +16,10 @@ export interface LlmModelConfig {
     initial_char: string; // expected to be a single character
     // Computed field (using the nested model's id)
     id: string;
+}
+export interface SingleLlmRequest {
+    llm: LlmModel;
+    prompt: string;
 }
 
 /**
@@ -101,7 +105,6 @@ export class DefaultLlmResponse implements LlmResponse {
     }
 }
 
-export const LLM_NAMES = ["Claude", "ChatGPT", "Gemini"]; //"Groq"
 
 export class DefaultLlmResponses implements LlmResponses {
     responses: Array<LlmResponse>;
