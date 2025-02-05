@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Askllm } from "@/components/ask-llm"
 import { Navigation } from '@/components/navigation';
 import { PromptComp } from '@/components/promptComp';
-import { AggregatedPriceResponse, DefaultLlmResponse, DefaultLlmResponses, insertLlmResponses, LlmModel, LlmResponse, LlmResponses, SingleLlmRequest, updateLlmResponses } from '@/components/types';
+import { LlmConfigurationsList, DefaultLlmResponse, DefaultLlmResponses, insertLlmResponses, LlmModel, LlmResponse, LlmResponses, SingleLlmRequest, updateLlmResponses } from '@/components/types';
 import { LlmResults } from '@/components/LlmResults';
 import { TabOption } from '@/types/aggregator';
 
@@ -12,7 +12,7 @@ export default function Page() {
     const [activeTab, setActiveTab] = useState<TabOption>("Continuous")
     const [isRunning, setIsRunning] = useState(false)
     const [prompt, setPrompt] = useState('');
-    const [aggregatedPriceData, setAggregatedPriceData] = useState<AggregatedPriceResponse | null>(null);
+    const [aggregatedPriceData, setAggregatedPriceData] = useState<LlmConfigurationsList | null>(null);
 
     useEffect(() => {
         async function fetchAggregatedPrice() {
@@ -21,7 +21,7 @@ export default function Page() {
                 if (!res.ok) {
                     throw new Error('Failed to fetch aggregated price data');
                 }
-                const data: AggregatedPriceResponse = await res.json();
+                const data: LlmConfigurationsList = await res.json();
                 setAggregatedPriceData(data);
             } catch (error) {
                 console.error(error);
@@ -49,7 +49,7 @@ export default function Page() {
         let randomLlm: LlmModel;
         if (aggregatedPriceData && aggregatedPriceData.responses && aggregatedPriceData.responses.length > 0) {
             const randomIndex = Math.floor(Math.random() * aggregatedPriceData.responses.length);
-            randomLlm = aggregatedPriceData.responses[randomIndex].config.model;
+            randomLlm = aggregatedPriceData.responses[randomIndex].model;
         } else {
             randomLlm = defaultLlm;
         }
@@ -130,7 +130,7 @@ export default function Page() {
 
         const fetchPromises = aggregatedPriceData?.responses.map(async (entry, llmIndex) => {
             const requestBody: SingleLlmRequest = {
-                llm: entry.config.model,
+                llm: entry.model,
                 prompt: text
             };
 
@@ -155,7 +155,7 @@ export default function Page() {
             } catch (error) {
                 console.error(error);
                 setAllResults(prev => {
-                    return insertLlmResponses(prev, newIndex, llmIndex, () => DefaultLlmResponse.createError(entry.config.model))
+                    return insertLlmResponses(prev, newIndex, llmIndex, () => DefaultLlmResponse.createError(entry.model))
                 });
             }
         }) ?? [];

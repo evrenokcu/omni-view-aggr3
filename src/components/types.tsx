@@ -23,30 +23,21 @@ export interface SingleLlmRequest {
 }
 
 /**
- * Represents a pricing detail.
- */
-export interface ModelPrice {
-    input_price: number;
-    output_price: number;
-    currency: string;
-}
-
-/**
  * Represents an aggregated price entry.
  * (We include pricing here in case you want to use it; if not, you can ignore it.)
  */
-export interface AggregatedPrice {
+export interface LlmModelConfigurations {
     config: LlmModelConfig;
-    price?: ModelPrice;
+    // price?: ModelPrice;
     // Optionally, you could also include a timestamp if needed.
-    timestamp?: string;
+    // timestamp?: string;
 }
 
 /**
  * Represents the overall aggregated price response.
  */
-export interface AggregatedPriceResponse {
-    responses: AggregatedPrice[];
+export interface LlmConfigurationsList {
+    responses: LlmModelConfig[];
 }
 export interface LlmModel {
     llm_name: string; // e.g. "ChatGPT", "CLAUDE", "Gemini"
@@ -110,9 +101,9 @@ export class DefaultLlmResponses implements LlmResponses {
     responses: Array<LlmResponse>;
     summary: LlmResponse;
 
-    constructor(aggregatedPriceData?: AggregatedPriceResponse) {
+    constructor(aggregatedPriceData?: LlmConfigurationsList) {
         const models = aggregatedPriceData
-            ? aggregatedPriceData.responses.map(entry => entry.config.model)
+            ? aggregatedPriceData.responses.map(entry => entry.model)
             : [];
         this.responses = models.map((name) => DefaultLlmResponse.createPending(name));
         this.summary = DefaultLlmResponse.createCreated(models[0]);
