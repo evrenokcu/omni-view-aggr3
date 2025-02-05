@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Clock, Loader } from "lucide-react"
@@ -13,16 +13,34 @@ interface LlmCardProps {
     response: LlmResponse;
     className?: string;
 }
-const formatElapsedTime = (ms: number) => {
-    return parseFloat(ms.toFixed(3));
-}
+
 export function LlmCard({ response, className }: LlmCardProps) {
     const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const [elapsedTime, setElapsedTime] = useState(0);
+    const [timerActive, setTimerActive] = useState(false);
     const toggleExpand = (llm: string) => {
         setExpandedCards(prev => ({ ...prev, [llm]: !prev[llm] }));
     };
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout | null = null;
+
+        if (response.status === "pending") {
+            setTimerActive(true);
+            setElapsedTime(0); // Reset timer
+            interval = setInterval(() => {
+                setElapsedTime(prev => prev + 10); // Increment in milliseconds
+            }, 10);
+        } else if (timerActive) {
+            setTimerActive(false);
+            if (interval) clearInterval(interval);
+        }
+
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [response.status, timerActive]);
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
@@ -123,7 +141,7 @@ export function LlmCard({ response, className }: LlmCardProps) {
                                 <Clock className="w-4 h-4 mr-1" />
                                 Elapsed Time:
                             </span>
-                            <span className="text-white">{`${formatElapsedTime(response.duration)}s`}</span>
+                            <span className="text-white">{`${(elapsedTime / 1000).toFixed(2)}s`}</span>
                         </div>
                         <div className="flex justify-between text-sm">
                             <span className="text-gray-400">Token Count:</span>
@@ -164,6 +182,7 @@ export function LlmCard({ response, className }: LlmCardProps) {
                     </div>
                 </div>
             </Card>
+
             <LlmModalCard isOpen={isModalOpen} onClose={closeModal} title={response.llm.llm_name}>
                 {/* <MarkdownRenderer
                     content={
