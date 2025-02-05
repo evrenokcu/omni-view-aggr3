@@ -9,7 +9,7 @@
             "output_price": 0.0008,
             "currency": "USD"
         },
-        "timestamp": "2025-02-02T19:19:47.460720"
+        "timestamp": "2025-02-04T19:01:44.881054"
     },
     "Claude:claude-3-5-sonnet-20240620": {
         "model": {
@@ -21,7 +21,7 @@
             "output_price": 0.0008,
             "currency": "USD"
         },
-        "timestamp": "2025-02-02T19:19:47.460766"
+        "timestamp": "2025-02-04T19:01:44.881135"
     },
     "ChatGPT:gpt-3.5-turbo": {
         "model": {
@@ -33,7 +33,7 @@
             "output_price": 0.004,
             "currency": "USD"
         },
-        "timestamp": "2025-02-02T19:19:47.460789"
+        "timestamp": "2025-02-04T19:01:44.881152"
     },
     "ChatGPT:gpt-4-turbo-preview": {
         "model": {
@@ -45,18 +45,18 @@
             "output_price": 0.06,
             "currency": "USD"
         },
-        "timestamp": "2025-02-02T19:19:47.460810"
+        "timestamp": "2025-02-04T19:01:44.881166"
     },
-    "Gemini:gemini-exp-1121": {
+    "Gemini:gemini-2.0-flash-exp": {
         "model": {
             "llm_name": "Gemini",
-            "model_name": "gemini-exp-1121"
+            "model_name": "gemini-2.0-flash-exp"
         },
         "pricing": {
             "input_price": 0.0004,
             "output_price": 0.0008,
             "currency": "USD"
         },
-        "timestamp": "2025-02-02T19:19:47.460830"
+        "timestamp": "2025-02-04T19:01:44.881180"
     }
 }

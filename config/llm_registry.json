@@ -38,7 +38,7 @@
     {
         "model": {
             "llm_name": "Gemini",
-            "model_name": "gemini-exp-1121"
+            "model_name": "gemini-2.0-flash-exp"
         },
         "enabled": true,
         "color": "#000090",

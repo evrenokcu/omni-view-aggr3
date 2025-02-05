@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Clock, Loader } from "lucide-react"
-import { Save, X } from 'lucide-react';
+import { Save, } from 'lucide-react';
 import { formatTimestamp, LlmResponse } from '@/components/types';
 import { XCircle } from "lucide-react";
+import { LlmModalCard } from './LlmModalCard';
+import MarkdownRenderer from './MarkdownRenderer';
+
 
 interface LlmCardProps {
     response: LlmResponse;
@@ -88,11 +91,13 @@ export function LlmCard({ response, className }: LlmCardProps) {
                                 <Loader className="w-6 h-6 text-white animate-spin" /> {/* Spinner */}
                             </div>
                         ) : (
-                            <p>
-                                {expandedCards[response.llm.llm_name]
-                                    ? response.response
-                                    : `${response.response.slice(0, 200)}...`}
-                            </p>
+                            <MarkdownRenderer
+                                content={
+                                    expandedCards[response.llm.llm_name]
+                                        ? response.response
+                                        : `${response.response.slice(0, 200)}...`
+                                }
+                            />
                         )}
 
                         {response.response.length > 200 && response.status === "completed" && (
@@ -159,47 +164,29 @@ export function LlmCard({ response, className }: LlmCardProps) {
                     </div>
                 </div>
             </Card>
+            <LlmModalCard isOpen={isModalOpen} onClose={closeModal} title={response.llm.llm_name}>
+                {/* <MarkdownRenderer
+                    content={
+                        expandedCards[response.llm.llm_name]
+                            ? response.response
+                            : `${response.response.slice(0, 200)}...`
+                    }
+                /> */}
+                <div className="text-black text-base leading-relaxed overflow-y-auto">
+                    {<MarkdownRenderer
+                        content={
+                            response.response
+                        }
+                    />}
+                    {response.assessment && (
+                        <div className="mt-4 p-2 bg-purple-100 rounded">
+                            <h4 className="font-semibold mb-2">Assessment:</h4>
+                            <p>{response.assessment}</p>
 
-            {/* Modal for Full-Screen View */}
-            {isModalOpen && (
-                <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center">
-                    <div className="w-[90vw] h-[90vh] bg-white overflow-auto relative rounded-lg shadow-lg">
-                        <div className="absolute top-4 right-4">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-gray-800 hover:text-red-600"
-                                onClick={closeModal}
-                            >
-                                <X className="w-5 h-5" />
-                            </Button>
                         </div>
-                        <Card className="w-full h-full rounded-lg">
-                            <div className="p-6">
-                                <div className="flex items-center gap-3 mb-3">
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getAvatarStyles(response.llm.llm_name)}`}>
-                                        <span className="text-sm font-semibold text-gray-800">{response.llm.llm_name[0]}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="font-medium text-black text-lg">{response.llm.llm_name}</span>
-                                        <span className="text-sm text-emerald-500">{response.status}</span>
-                                        <span className="text-sm text-gray-400">{formatTimestamp(response.timestamp)}</span>
-                                    </div>
-                                </div>
-                                <div className="text-black text-base leading-relaxed mb-4 overflow-y-auto">
-                                    <p>{response.response}</p>
-                                    {response.assessment && (
-                                        <div className="mt-4 p-2 bg-purple-100 rounded">
-                                            <h4 className="font-semibold mb-2">Assessment:</h4>
-                                            <p>{response.assessment}</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </Card>
-                    </div>
+                    )}
                 </div>
-            )}
+            </LlmModalCard>
         </>
     );
 }
