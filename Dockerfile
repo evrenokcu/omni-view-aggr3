@@ -27,6 +27,9 @@ FROM node:18-alpine
 WORKDIR /app
 ENV NODE_ENV=production
 
+# Copy package.json from the build stage
+COPY --from=builder /app/package.json ./
+
 # Copy only the built application and production dependencies from the build stage
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
@@ -40,3 +43,4 @@ VOLUME /price
 
 # Start the Next.js application
 CMD ["npm", "start"]
+
