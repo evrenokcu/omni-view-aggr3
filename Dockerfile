@@ -1,17 +1,15 @@
 # Stage 1: Build stage
 FROM node:18-alpine AS builder
 
-# Install curl (optional) and other build dependencies
-RUN apk add --no-cache curl
-
 # Set working directory
 WORKDIR /app
 
 # Copy package.json and package-lock.json
+#COPY package*.json ./
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
 # Copy the rest of the application files
 COPY components.json tsconfig.json next.config.ts postcss.config.mjs tailwind.config.ts ./
