@@ -6,28 +6,37 @@ import { PromptComp } from '@/components/promptComp';
 import { LlmConfigurationsList, DefaultLlmResponse, DefaultLlmResponses, insertLlmResponses, LlmModel, LlmResponse, LlmResponses, SingleLlmRequest, updateLlmResponses } from '@/components/types';
 import { LlmResults } from '@/components/LlmResults';
 import { TabOption } from '@/types/aggregator';
+import { Underdog } from 'next/font/google';
 
 export default function Page() {
     const [allResults, setAllResults] = useState<LlmResponses[]>([]);
     const [activeTab, setActiveTab] = useState<TabOption>("Continuous")
     const [isRunning, setIsRunning] = useState(false)
     const [prompt, setPrompt] = useState('');
-    const [aggregatedPriceData, setAggregatedPriceData] = useState<LlmConfigurationsList | null>(null);
-
+    const [llm_configuration_list, setLlmConfigurationList] = useState<LlmConfigurationsList>({
+        responses: {}, // Default to an empty dictionary
+        getLlmModelConfig: (model: LlmModel) => undefined, // Default function returning undefined
+        getRandomLlm: () => defaultLlm
+    });
+    const defaultLlm: LlmModel = {
+        llm_name: "DefaultLLM",
+        model_name: "default",
+        id: "DefaultLLM:default",
+    };
     useEffect(() => {
-        async function fetchAggregatedPrice() {
+        async function fetchLlmConfigurationList() {
             try {
                 const res = await fetch('/api/aggregated-price');
                 if (!res.ok) {
                     throw new Error('Failed to fetch aggregated price data');
                 }
                 const data: LlmConfigurationsList = await res.json();
-                setAggregatedPriceData(data);
+                setLlmConfigurationList(data);
             } catch (error) {
                 console.error(error);
             }
         }
-        fetchAggregatedPrice();
+        fetchLlmConfigurationList();
     }, []);
 
     const handleSummarize = async (responses: LlmResponses, idx: number) => {
@@ -40,25 +49,18 @@ export default function Page() {
         const summarizePrompt = `summarize all responses from these llms\n${allTexts}`;
 
         // Choose a random LLM
-        const defaultLlm: LlmModel = {
-            llm_name: "DefaultLLM",
-            model_name: "default",
-            id: "DefaultLLM:default",
-        };
 
-        let randomLlm: LlmModel;
-        if (aggregatedPriceData && aggregatedPriceData.responses && aggregatedPriceData.responses.length > 0) {
-            const randomIndex = Math.floor(Math.random() * aggregatedPriceData.responses.length);
-            randomLlm = aggregatedPriceData.responses[randomIndex].model;
-        } else {
-            randomLlm = defaultLlm;
-        }
+
+        const firstLlm = Object.values(llm_configuration_list.responses)[0]?.model;
+
+        //        const randomLlm = llm_configuration_list.getRandomLlm();
+
 
         // Set the summary status to "pending"
         setAllResults((prev) =>
             updateLlmResponses(prev, idx, (responses) => {
                 responses.summary = {
-                    llm: randomLlm,
+                    llm: firstLlm,
                     response: "",
                     timestamp: new Date().toISOString(),
                     status: "pending",
@@ -77,7 +79,7 @@ export default function Page() {
         try {
 
             const requestBody: SingleLlmRequest = {
-                llm: randomLlm,
+                llm: firstLlm,
                 prompt: summarizePrompt
             };
 
@@ -131,41 +133,42 @@ export default function Page() {
 
     const handleSubmitNew = async (text: string) => {
         setIsRunning(true);
-        const initialResponses = new DefaultLlmResponses(aggregatedPriceData!);
+        const initialResponses = new DefaultLlmResponses(llm_configuration_list!);
         const newIndex = allResults.length;
         setAllResults(prev => [...prev, initialResponses]);
 
-        const fetchPromises = aggregatedPriceData?.responses.map(async (entry, llmIndex) => {
-            const requestBody: SingleLlmRequest = {
-                llm: entry.model,
-                prompt: text
-            };
+        const fetchPromises = Object.values(llm_configuration_list?.responses).map(
+            async (entry, llmIndex) => {
+                const requestBody: SingleLlmRequest = {
+                    llm: entry.model,
+                    prompt: text,
+                };
 
-            try {
-                const response = await fetch('/api/process', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestBody)
-                });
+                try {
+                    const response = await fetch('/api/process', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestBody)
+                    });
 
-                if (!response.ok) {
-                    const errorBody = await response.text();
-                    console.error('Network response not ok. Status:', response.status, 'Response body:', errorBody);
-                    throw new Error('Network response was not ok');
+                    if (!response.ok) {
+                        const errorBody = await response.text();
+                        console.error('Network response not ok. Status:', response.status, 'Response body:', errorBody);
+                        throw new Error('Network response was not ok');
+                    }
+
+                    const data = await response.json() as LlmResponse;
+
+                    setAllResults(prev => {
+                        return insertLlmResponses(prev, newIndex, llmIndex, () => data)
+                    });
+                } catch (error) {
+                    console.error(error);
+                    setAllResults(prev => {
+                        return insertLlmResponses(prev, newIndex, llmIndex, () => DefaultLlmResponse.createError(entry.model))
+                    });
                 }
-
-                const data = await response.json() as LlmResponse;
-
-                setAllResults(prev => {
-                    return insertLlmResponses(prev, newIndex, llmIndex, () => data)
-                });
-            } catch (error) {
-                console.error(error);
-                setAllResults(prev => {
-                    return insertLlmResponses(prev, newIndex, llmIndex, () => DefaultLlmResponse.createError(entry.model))
-                });
-            }
-        }) ?? [];
+            }) ?? [];
         await Promise.all(fetchPromises);
         setIsRunning(false);
     }
@@ -191,6 +194,7 @@ export default function Page() {
                         <div key={idx} style={{ margin: '16px 0' }}>
                             <LlmResults
                                 results={results}
+                                configurations={llm_configuration_list}
                                 onAssess={(responses) => {
                                     const allTexts = responses.responses
                                         .filter((r) => r !== null)

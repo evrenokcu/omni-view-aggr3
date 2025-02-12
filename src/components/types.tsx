@@ -22,23 +22,36 @@ export interface SingleLlmRequest {
     prompt: string;
 }
 
-/**
- * Represents an aggregated price entry.
- * (We include pricing here in case you want to use it; if not, you can ignore it.)
- */
-export interface LlmModelConfigurations {
-    config: LlmModelConfig;
-    // price?: ModelPrice;
-    // Optionally, you could also include a timestamp if needed.
-    // timestamp?: string;
-}
+// /**
+//  * Represents an aggregated price entry.
+//  * (We include pricing here in case you want to use it; if not, you can ignore it.)
+//  */
+// export interface LlmModelConfigurations {
+//     config: LlmModelConfig;
+//     // price?: ModelPrice;
+//     // Optionally, you could also include a timestamp if needed.
+//     // timestamp?: string;
+// }
 
 /**
  * Represents the overall aggregated price response.
  */
+// export interface LlmConfigurationsList {
+//     responses: LlmModelConfig[];
+// }
+
+// LlmConfigurationsList with dictionary structure
 export interface LlmConfigurationsList {
-    responses: LlmModelConfig[];
+    responses: {
+        [modelId: string]: LlmModelConfig; // Dictionary for O(1) look-up
+    };
+
+    // Method to get LlmModelConfig by LlmModel
+    getLlmModelConfig: (model: LlmModel) => LlmModelConfig | undefined;
+    // Add getRandomLlm method to the interface
+    getRandomLlm: () => LlmModel;
 }
+
 export interface LlmModel {
     llm_name: string; // e.g. "ChatGPT", "CLAUDE", "Gemini"
     model_name: string;
@@ -111,13 +124,16 @@ export class DefaultLlmResponses implements LlmResponses {
     summary: LlmResponse;
 
     constructor(aggregatedPriceData?: LlmConfigurationsList) {
+        // Extract models from the responses dictionary using Object.values()
         const models = aggregatedPriceData
-            ? aggregatedPriceData.responses.map(entry => entry.model)
+            ? Object.values(aggregatedPriceData.responses).map(entry => entry.model)
             : [];
+
         this.responses = models.map((name) => DefaultLlmResponse.createPending(name));
         this.summary = DefaultLlmResponse.createCreated(models[0]);
     }
 }
+
 export function updateLlmResponses(
     llmResponsesArray: LlmResponses[],
     idx: number,

@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { LlmResponses } from './types';
+import { LlmConfigurationsList, LlmResponses } from './types';
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { LlmCard } from './LlmCard';
@@ -11,11 +11,12 @@ import { SummarizeButton } from './summarize-button';
 
 interface LlmResultsProps {
     results: LlmResponses;
+    configurations: LlmConfigurationsList
     onAssess: (responses: LlmResponses) => void;
     onSummarize: (responses: LlmResponses) => void;
 }
 
-export function LlmResults({ results, onAssess: onAssess, onSummarize }: LlmResultsProps) {
+export function LlmResults({ results, configurations, onAssess: onAssess, onSummarize }: LlmResultsProps) {
 
 
     const handleAssessCompare = () => {
