@@ -111,7 +111,7 @@ export default function Page() {
             setAllResults((prev) =>
                 updateLlmResponses(prev, idx, (responses) => {
                     responses.summary = {
-                        llm: randomLlm,
+                        llm: firstLlm,
                         response: "Failed to summarize responses",
                         timestamp: new Date().toISOString(),
                         status: "error",
