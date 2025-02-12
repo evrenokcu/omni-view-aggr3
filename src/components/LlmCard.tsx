@@ -141,7 +141,7 @@ export function LlmCard({ response, className }: LlmCardProps) {
                                 <Clock className="w-4 h-4 mr-1" />
                                 Elapsed Time:
                             </span>
-                            <span className="text-white">{`${(elapsedTime / 1000).toFixed(2)}s`}</span>
+                            <span className="text-white font-mono">{`${(elapsedTime / 1000).toFixed(2)}s`}</span>
                         </div>
                         <div className="flex justify-between text-sm">
                             <span className="text-gray-400">Token Count:</span>
@@ -149,8 +149,15 @@ export function LlmCard({ response, className }: LlmCardProps) {
                         </div>
                         <div className="flex justify-between text-sm">
                             <span className="text-gray-400">Estimated Cost:</span>
-                            <span className="text-white">{`$${response.price}`}</span>
+                            <span className="text-white">{`$${response.estimated_cost.toFixed(9)}`}</span>
                         </div>
+                        {/*  */}
+                        <div className="flex justify-between text-sm">
+                            <span className="text-gray-400">Response Time:</span>
+                            <span className="text-white">{`${response.response_time.toFixed(2)}s`}</span>
+                        </div>
+
+                        {/*  */}
                         <div className="flex justify-between text-sm items-center">
                             <span className="text-gray-400">Visor Rating:</span>
                             <span className="text-white flex items-center">

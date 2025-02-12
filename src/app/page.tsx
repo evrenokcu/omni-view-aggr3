@@ -62,9 +62,13 @@ export default function Page() {
                     response: "",
                     timestamp: new Date().toISOString(),
                     status: "pending",
-                    duration: 0,
+                    response_time: 0,
                     token_count: 0,
                     price: 0,
+                    estimated_cost: 0,
+                    input_tokens: 0,
+                    output_tokens: 0,
+
                 };
                 return responses;
             })
@@ -109,9 +113,12 @@ export default function Page() {
                         response: "Failed to summarize responses",
                         timestamp: new Date().toISOString(),
                         status: "error",
-                        duration: 0,
+                        response_time: 0,
                         token_count: 0,
                         price: 0,
+                        estimated_cost: 0,
+                        input_tokens: 0,
+                        output_tokens: 0,
                     };
                     return responses;
                 })

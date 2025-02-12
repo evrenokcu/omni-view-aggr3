@@ -28,6 +28,8 @@ export async function POST(request: NextRequest): Promise<Response> {
 
         const data: LlmResponse = await response.json();
 
+        console.log(response.json);
+
         return NextResponse.json(data)
     } catch (err) {
         console.error('Error in POST handler:', err);
